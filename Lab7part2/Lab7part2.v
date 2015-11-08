@@ -1,6 +1,6 @@
 // Part 2 skeleton
 
-module fill
+module Lab7part2
 	(
 		CLOCK_50,						//	On Board 50 MHz
 		// Your inputs and outputs here
@@ -69,30 +69,115 @@ module fill
 	// Put your code here. Your code should produce signals x,y,colour and writeEn
 	// for the VGA controller, in addition to any other functionality your design may require.
     
-	 
-	 
+		reg [6:0]posX,posY;
+		reg [0:0]enable;
+		reg [6:0]FSMX,FSMY;
+		//Load X
+		always@(posedge KEY[3])
+			if(KEY[0]==0)
+				posX<=7'b0;
+			else 
+				posX<=SW[6:0];
+		//Load Y
+		always@(posedge KEY[1])
+			if(KEY[0]==0)
+				posY<=7'b0;
+			else
+				begin
+				posY<=SW[6:0];
+				enable = 1'b1;
+				end
+		
     // Instanciate datapath
-	
+		datapath data_(SW[9:7],posX,posY,x,y,colour,KEY[0],CLOCK_50,KEY[2]);
     // Instanciate FSM control
-
+		FSM fsm_(KEY[2],enable,KEY[0],CLOCK_50);
 endmodule
 
 
 module FSM (
-input [0:0]Black,Plot,ResetN,Clk,
-input [6:0]CtrX,CtrY,
-output [0:0]Blk,PlotOut);
+input [0:0]Black,Plot,ResetN,Clk);
+
+	reg [6:0]FSMX,FSMY;
+	reg [0:0]enable;
 	
-	
+	always@(posedge Clk)
+	if(ResetN==0)
+		enable <=0;
+	else if(Plot==1)
+		begin
+			if(Black==0)
+				begin
+				if(FSMY==3&&FSMX==3)
+					begin
+					FSMY <= 0;
+					FSMX <= 0;
+					enable <= 0;
+					end
+				else if(FSMX==3)
+					begin
+					FSMY <= FSMY +1;
+					FSMX <= 0;
+					enable <= 1;
+					end
+				else
+					begin
+					FSMY <= FSMY +1;
+					FSMX <= FSMX +1;
+					enable <= 1;
+					end
+				end
+			else
+				begin
+				if(FSMX==160&&FSMY==120)
+					begin
+					FSMY <= 0;
+					FSMX <= 0;
+					enable <= 0;
+					end
+				else if(FSMX==160)
+					begin
+					FSMY <= FSMY +1;
+					FSMX <= 0;
+					enable <= 1;
+					end
+				else
+					begin
+					FSMY <= FSMY +1;
+					FSMX <= FSMX +1;
+					enable <= 1;
+					end
+				end
+		end
 endmodule
  
 module datapath(
 input [2:0]colorIn,
-input [6:0]posXin,posYin,posXFSM,posYFSM,
-output [6:0]posXout,posYout,
-output [2:0]colorOut,
-input [0:0]ResetN,clk);
+input [6:0]posXin,posYin,
+output reg[7:0]posXout,
+output reg[6:0]posYout,
+output reg[2:0]colorOut,
+input [0:0]ResetN,clk,Black);
 	
-	
+	reg [6:0]FSMX,FSMY;
+	always@(posedge clk)
+	if(ResetN==0)
+		begin
+			FSMX <= 0;
+			FSMY <= 0;
+		end
+	else if(Black == 1)
+		begin
+			posXout = {1'b0,FSMX};
+			posYout = FSMY;
+			colorOut = 3'b000;
+		end
+	else 
+		begin
+			posXout = {1'b0,posXin + FSMX};
+			posYout = posYin + FSMY;
+			colorOut = colorIn;
+		end
  
 endmodule
+

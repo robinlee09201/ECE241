@@ -72,6 +72,11 @@ module Lab7part2
 		reg [6:0]posX,posY;
 		reg [0:0]enable;
 		reg [6:0]FSMX,FSMY;
+		wire [6:0]FSM_X,FSM_Y;
+		wire [0:0]enable_;
+		assign FSM_X = FSMX;
+		assign FSM_Y = FSMY;
+		assign enable_ = enable;
 		//Load X
 		always@(posedge KEY[3])
 			if(KEY[0]==0)
@@ -89,18 +94,21 @@ module Lab7part2
 				end
 		
     // Instanciate datapath
-		datapath data_(SW[9:7],posX,posY,x,y,colour,KEY[0],CLOCK_50,KEY[2]);
+		datapath data_(SW[9:7],posX,posY,x,y,colour,KEY[0],CLOCK_50,KEY[2],FSM_X,FSM_Y);
     // Instanciate FSM control
-		FSM fsm_(KEY[2],enable,KEY[0],CLOCK_50);
+		FSM fsm_(KEY[2],enable,KEY[0],CLOCK_50,FSM_X,FSM_Y,enable_);
 endmodule
 
 
 module FSM (
-input [0:0]Black,Plot,ResetN,Clk);
-
-	reg [6:0]FSMX,FSMY;
-	reg [0:0]enable;
-	
+input [0:0]Black,Plot,ResetN,Clk,
+inout [6:0]fsmx,fsmy,
+inout [0:0]enable_);
+	reg[6:0]FSMX,FSMY;
+	reg[0:0]enable;
+	assign fsmx = FSMX;
+	assign fsmy = FSMY;
+	assign enable_ = enable;
 	always@(posedge Clk)
 	if(ResetN==0)
 		enable <=0;
@@ -157,9 +165,11 @@ input [6:0]posXin,posYin,
 output reg[7:0]posXout,
 output reg[6:0]posYout,
 output reg[2:0]colorOut,
-input [0:0]ResetN,clk,Black);
-	
-	reg [6:0]FSMX,FSMY;
+input [0:0]ResetN,clk,Black,
+inout [6:0]FSMX_,FSMY_);
+	reg[6:0]FSMX,FSMY;
+	assign FSMX_ = FSMX;
+	assign FSMY_ = FSMY;
 	always@(posedge clk)
 	if(ResetN==0)
 		begin

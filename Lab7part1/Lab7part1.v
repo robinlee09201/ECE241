@@ -7,7 +7,7 @@ module Lab7part1 (
 	ram32x4 ram0(SW[8:4],KEY[0],SW[3:0],SW[9],outdata);
 	HEX_decorder HEX0_(outdata[3:0],HEX0[0:6]);
 	HEX_decorder HEX4_(SW[7:4],HEX4[0:6]);
-	HEX_decorder HEX5_({SW[8],3'b000},HEX5[0:6]);
+	HEX_decorder HEX5_({3'b000,SW[8]},HEX5[0:6]);
 endmodule
 
 module HEX_decorder(SW,HEX0);

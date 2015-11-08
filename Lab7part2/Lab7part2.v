@@ -78,38 +78,21 @@ module fill
 endmodule
 
 
-module FSM (key1, key2, selectA , selectB , LD_A, LD_B, ALU_OP, load, key0, clock, LD_out);
-parameter [2:0] AX_S = 3'b000, AXX_S = 3'b001, BX_S = 3'b010, AXX_BX_S = 3'b011, AXX_BX_C_S = 3'b100, RESET_S = 3'b111, LOAD_AX_S = 3'b101, LOAD_BC_S = 3'b110;
-parameter MULTI = 0, ADD = 1;
-parameter[1:0] selRX = 2'b00, selRA = 2'b01, selRB= 2'b10, selRC = 2'b11;
-  input key1, key2, key0, clock;
-  output reg [1:0] selectA , selectB;
-  output reg LD_A, LD_B, ALU_OP,LD_out, load;
-  reg [2:0]PresentState, NextState;
-
-  always@(*) begin 
-    case (PresentState) 
-	RESET_S:
-				if(key1==0)
-					NextState = LOAD_AX_S;
-				else
-					NextState = RESET_S;
-	LOAD_AX_S:
-				if(key1==0&&key2==1)
-					NextState = LOAD_BC_S;
-				else
-					NextState = LOAD_AX_S;
-	LOAD_BC_S:
-				if(key1==1&&key2==1)
-					NextState = AX_S;
-				else if(key1==0&&key2==1)
-					NextState = LOAD_AX_S;
-				else
-					NextState = LOAD_BC_S;
-      AX_S: NextState = AXX_S;
-      AXX_S: NextState = BX_S;
-      BX_S: NextState = AXX_BX_S;
-      AXX_BX_S: NextState = AXX_BX_C_S;
-      default: NextState = RESET_S;
-    endcase
-  end
+module FSM (
+input [0:0]Black,Plot,ResetN,Clk,
+input [6:0]CtrX,CtrY,
+output [0:0]Blk,PlotOut);
+	
+	
+endmodule
+ 
+module datapath(
+input [2:0]colorIn,
+input [6:0]posXin,posYin,posXFSM,posYFSM,
+output [6:0]posXout,posYout,
+output [2:0]colorOut,
+input [0:0]ResetN,clk);
+	
+	
+ 
+endmodule
